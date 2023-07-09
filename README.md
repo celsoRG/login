@@ -1,10 +1,11 @@
 # login
 
-Clone this repo
+## Clone this repo
 git clone https://github.com/celsoRG/login.git
 
-Install dependency
-$ npm install
+## Install dependency
+ ~$ cd logon
+ ~$ npm install
 
-Run the project
-npx react-native run-android
+## Run the project
+ ~$ npx react-native run-android
