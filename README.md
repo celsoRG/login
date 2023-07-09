@@ -1,7 +1,7 @@
 # login
 
 Clone this repo
-git clone https://github.com/samironbarai/rn-auth.git
+git clone https://github.com/celsoRG/login.git
 
 Install dependency
 $ npm install
