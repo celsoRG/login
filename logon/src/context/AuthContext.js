@@ -1,88 +1,75 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import React, { createContext, useEffect, useState } from 'react';
+import React, {createContext, useEffect, useState} from 'react';
+import {LOGIN_MUTATION, SIGNUP_MUTATION} from '../apollo/mutations';
+import {useMutation} from '@apollo/client';
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({children}) => {
   const [userInfo, setUserInfo] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [splashLoading, setSplashLoading] = useState(false);
+  const [signup] = useMutation(SIGNUP_MUTATION);
+  const [loginUser] = useMutation(LOGIN_MUTATION);
 
-
-
-  
-
-  const register = async () => {
-    try {
-      const shop = 'pequenoigloo';
-      const apiVersion = '2023-07';
-      const url = `https://${shop}.myshopify.com/api/${apiVersion}/graphql.json`;
-  
-      const input = {
-        email: 'celso.re.go@hotmail.com',
-        password: '123456',
-      };
-  
-      const variables = {
-        input: input,
-      };
-  
-      const accessToken = 'shpat_c5'; // Reemplaza con tu token de acceso
-  
-      const response = await axios.post(
-        url,
-        {
-          query: `
-            mutation customerCreate($input: CustomerCreateInput!) {
-              customerCreate(input: $input) {
-                customerUserErrors {
-                  code
-                  field
-                  message
-                }
-                customer {
-                  id
-                }
-              }
-            }
-          `,
-          variables: variables,
+  const register = async (name, email, password) => {
+    const res = await signup({
+      variables: {
+        input: {
+          firstName: name,
+          email: email,
+          password: password,
         },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Shopify-Access-Token': accessToken,
-          },
-        }
-      );
-  
-      if (response.status === 200) {
-        console.log('Se ha registrado exitosamente');
-      } else {
-        console.log('Ha ocurrido un error en la llamada');
-      }
-    } catch (error) {
-      console.error('Error en la solicitud',error);
-      // Aquí puedes manejar los errores de la solicitud
+      },
+    });
+    console.log(res.data.customerCreate);
+    if (res.data.customerCreate) {
+      alert(`Customer ${res.data.customerCreate?.customer?.firstName} Created`);
     }
+    if (res?.data?.customerCreate?.customerUserErrors.length > 0) {
+      alert(` ${res.data.customerCreate?.customerUserErrors?.[0].message}`);
+    }
+
+    //   if (response.status === 200) {
+    //     console.log('Se ha registrado exitosamente');
+    //   } else {
+    //     console.log('Ha ocurrido un error en la llamada');
+    //   }
+    // } catch (error) {
+    //   console.error('Error en la solicitud', error);
+    //   // Aquí puedes manejar los errores de la solicitud
+    // }
   };
 
-
-
-
-  
-  const login = (email, password) => {
+  const login = async (email, password) => {
+    const res = await loginUser({
+      variables: {
+        input: {
+          email: email,
+          password: password,
+        },
+      },
+    });
     setIsLoading(true);
+
+    await AsyncStorage.setItem(
+      'userInfo',
+      res.data.customerAccessTokenCreate.customerAccessToken.accessToken,
+    );
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
 
     // Perform login logic
 
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
-  const logout = () => {
+  const logout = async navigation => {
+    await AsyncStorage.removeItem('userInfo');
+    // navigation.navigate('Login');
     setIsLoading(true);
-
     // Perform logout logic
 
     setIsLoading(false);
@@ -93,11 +80,11 @@ export const AuthProvider = ({ children }) => {
       setSplashLoading(true);
 
       let userInfo = await AsyncStorage.getItem('userInfo');
-      userInfo = JSON.parse(userInfo);
+      console.log('userInfo', userInfo);
 
-      if (userInfo) {
-        setUserInfo(userInfo);
-      }
+      // if (userInfo) {
+      //   setUserInfo(userInfo !== null ? userInfo : {});
+      // }
 
       setSplashLoading(false);
     } catch (e) {
@@ -119,8 +106,7 @@ export const AuthProvider = ({ children }) => {
         register,
         login,
         logout,
-      }}
-    >
+      }}>
       {children}
     </AuthContext.Provider>
   );
