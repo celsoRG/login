@@ -8,24 +8,26 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import {AuthContext} from '../context/AuthContext';
 import SplashScreen from '../screens/SplashScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
   const {userInfo, splashLoading} = useContext(AuthContext);
-  console.log(userInfo.length);
+  if (splashLoading) {
+    return <SplashScreen />;
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
         {splashLoading ? (
           <Stack.Screen
-            name="Splash Screen"
+            name="Loading"
             component={SplashScreen}
             options={{headerShown: false}}
           />
-        ) : userInfo ? (
-          <Stack.Screen name="Home" component={HomeScreen} />
-        ) : (
+        ) : !userInfo ? (
           <>
             <Stack.Screen
               name="Login"
@@ -37,6 +39,10 @@ const Navigation = () => {
               component={RegisterScreen}
               options={{headerShown: false}}
             />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Home" component={HomeScreen} />
           </>
         )}
       </Stack.Navigator>

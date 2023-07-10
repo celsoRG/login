@@ -2,12 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, {createContext, useEffect, useState} from 'react';
 import {LOGIN_MUTATION, SIGNUP_MUTATION} from '../apollo/mutations';
-import {useMutation} from '@apollo/client';
+import {useMutation, useQuery} from '@apollo/client';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
-  const [userInfo, setUserInfo] = useState({});
+  const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [splashLoading, setSplashLoading] = useState(false);
   const [signup] = useMutation(SIGNUP_MUTATION);
@@ -23,23 +23,13 @@ export const AuthProvider = ({children}) => {
         },
       },
     });
-    console.log(res.data.customerCreate);
-    if (res.data.customerCreate) {
+
+    if (res?.data?.customerCreate?.customerUserErrors.length === 0) {
       alert(`Customer ${res.data.customerCreate?.customer?.firstName} Created`);
     }
     if (res?.data?.customerCreate?.customerUserErrors.length > 0) {
       alert(` ${res.data.customerCreate?.customerUserErrors?.[0].message}`);
     }
-
-    //   if (response.status === 200) {
-    //     console.log('Se ha registrado exitosamente');
-    //   } else {
-    //     console.log('Ha ocurrido un error en la llamada');
-    //   }
-    // } catch (error) {
-    //   console.error('Error en la solicitud', error);
-    //   // Aquí puedes manejar los errores de la solicitud
-    // }
   };
 
   const login = async (email, password) => {
@@ -51,28 +41,20 @@ export const AuthProvider = ({children}) => {
         },
       },
     });
-    setIsLoading(true);
-
+    setUserInfo(
+      res.data.customerAccessTokenCreate.customerAccessToken.accessToken,
+    );
     await AsyncStorage.setItem(
       'userInfo',
       res.data.customerAccessTokenCreate.customerAccessToken.accessToken,
     );
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-
-    // Perform login logic
-
-    // setIsLoading(false);
+    /
   };
 
-  const logout = async navigation => {
+  const logout = async () => {
     await AsyncStorage.removeItem('userInfo');
-    // navigation.navigate('Login');
-    setIsLoading(true);
-    // Perform logout logic
-
-    setIsLoading(false);
+    setUserInfo(null);
+    
   };
 
   const isLoggedIn = async () => {
@@ -80,11 +62,10 @@ export const AuthProvider = ({children}) => {
       setSplashLoading(true);
 
       let userInfo = await AsyncStorage.getItem('userInfo');
-      console.log('userInfo', userInfo);
 
-      // if (userInfo) {
-      //   setUserInfo(userInfo !== null ? userInfo : {});
-      // }
+      if (userInfo) {
+        setUserInfo(userInfo);
+      }
 
       setSplashLoading(false);
     } catch (e) {
@@ -95,7 +76,7 @@ export const AuthProvider = ({children}) => {
 
   useEffect(() => {
     isLoggedIn();
-  }, []);
+  }, [userInfo]);
 
   return (
     <AuthContext.Provider

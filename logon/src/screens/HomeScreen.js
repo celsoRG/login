@@ -1,21 +1,30 @@
 import React, {useContext} from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
-import Spinner from 'react-native-loading-spinner-overlay';
+import {ActivityIndicator, Button, StyleSheet, Text, View} from 'react-native';
 import {AuthContext} from '../context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useQuery} from '@apollo/client';
+import {CUSTOMER} from '../apollo/queries';
 
 const HomeScreen = ({navigation}) => {
-  const {userInfo, isLoading} = useContext(AuthContext);
-  const logout = async () => {
-    await AsyncStorage.clear();
-    // console.log('userInfo', navigation.);
-    navigation.navigate('Login');
-  };
+  const {userInfo, isLoading, logout} = useContext(AuthContext);
+  const {data, loading, error} = useQuery(CUSTOMER, {
+    variables: {
+      customerAccessToken: userInfo,
+    },
+  });
+
   return (
     <View style={styles.container}>
-      <Spinner visible={isLoading} />
-      <Text style={styles.welcome}>Welcome {userInfo?.user?.name}</Text>
-      <Button title="Logout" color="red" onPress={() => logout} />
+      {loading ? (
+        <ActivityIndicator />
+      ) : (
+        <>
+          <Text style={styles.welcome}>
+            Welcome {data?.customer?.firstName}
+          </Text>
+          <Button title="Logout" color="red" onPress={logout} />
+        </>
+      )}
     </View>
   );
 };
