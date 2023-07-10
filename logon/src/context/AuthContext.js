@@ -48,13 +48,11 @@ export const AuthProvider = ({children}) => {
       'userInfo',
       res.data.customerAccessTokenCreate.customerAccessToken.accessToken,
     );
-    /
   };
 
   const logout = async () => {
     await AsyncStorage.removeItem('userInfo');
     setUserInfo(null);
-    
   };
 
   const isLoggedIn = async () => {
