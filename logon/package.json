@@ -14,6 +14,7 @@
     "@react-native-async-storage/async-storage": "^1.18.1",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
+    "@stripe/stripe-react-native": "^0.33.0",
     "axios": "^1.4.0",
     "babel-plugin-graphql-js-client-transform": "^1.1.1",
     "graphql": "^16.7.1",

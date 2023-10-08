@@ -41,6 +41,7 @@ export const AuthProvider = ({children}) => {
         },
       },
     });
+    console.log('login Response===>', res);
     setUserInfo(
       res.data.customerAccessTokenCreate.customerAccessToken.accessToken,
     );

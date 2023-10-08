@@ -1,5 +1,12 @@
 import React, {useContext} from 'react';
-import {ActivityIndicator, Button, StyleSheet, Text, View} from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Button,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {AuthContext} from '../context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useQuery} from '@apollo/client';
@@ -22,7 +29,21 @@ const HomeScreen = ({navigation}) => {
           <Text style={styles.welcome}>
             Welcome {data?.customer?.firstName}
           </Text>
-          <Button title="Logout" color="red" onPress={logout} />
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+              alignItems: 'center',
+            }}>
+            <Button title="Logout" color="red" onPress={logout} />
+
+            <Button
+              title="Payment"
+              color="green"
+              onPress={() => navigation.navigate('Payment')}
+            />
+          </View>
         </>
       )}
     </View>
