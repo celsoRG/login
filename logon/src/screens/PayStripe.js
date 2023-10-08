@@ -33,7 +33,6 @@ const PayStripe = () => {
           },
         },
       );
-
       const {error: paymentSheetError} = await initPaymentSheet({
         merchantDisplayName: 'Example, Inc.',
         paymentIntentClientSecret: response.data.client_secret,
@@ -41,7 +40,6 @@ const PayStripe = () => {
           name: name,
         },
       });
-      console.log(paymentSheetError);
       if (paymentSheetError) {
         Alert.alert('Something went wrong', paymentSheetError.message);
         return;
@@ -59,16 +57,7 @@ const PayStripe = () => {
 
   return (
     <View style={styles.container}>
-      <CardField
-        postalCodeEnabled={true}
-        placeholder={{
-          number: '4242 4242 4242 4242',
-        }}
-        onCardChange={cardDetails => {
-          console.log('Card changed', cardDetails);
-        }}
-      />
-      {/* <TextInputSquare
+      <TextInputSquare
         border="#CD5C08"
         placeholder={' Cardholder Name'}
         value={name}
@@ -85,7 +74,7 @@ const PayStripe = () => {
           setAmount(txt);
         }}
         // errorMessage={text2Error ? 'Enter card number' : ''}
-      /> */}
+      />
       {/* <TextInputSquare
         border="#CD5C08"
         placeholder="Expiration Date"
