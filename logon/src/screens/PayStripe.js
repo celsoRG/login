@@ -19,6 +19,16 @@ const PayStripe = () => {
   const stripeAPIURL = 'https://api.stripe.com/v1/payment_intents';
   const handleCheck = async () => {
     try {
+      if (!name) {
+        Alert.alert('Name is required');
+        return;
+      }
+
+      // Check if the amount is empty or not a number
+      if (!amount || isNaN(parseFloat(amount))) {
+        Alert.alert('Amount must be a valid number');
+        return;
+      }
       const response = await axios.post(
         stripeAPIURL,
         {
